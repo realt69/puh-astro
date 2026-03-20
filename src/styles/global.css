@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Inter", sans-serif;
   --font-serif: "Cormorant Garamond", serif;
@@ -8,36 +10,109 @@
 
 @layer base {
   :root {
-    --accent: #E63946;
+    --accent-h: 354;
+    /* Світла тема: яскравий акцент */
+    --accent: hsl(var(--accent-h), 70%, 45%);
+
+    --bg-color: hsl(var(--accent-h), 15%, 97%);
+    --text-color: hsl(var(--accent-h), 15%, 15%);
+    --grid-color: hsla(var(--accent-h), 15%, 15%, 0.05);
+  }
+
+  .dark {
+    /* ТЕМНА ТЕМА: Приглушуємо акцент (менше насиченості, менше яскравості) */
+    --accent: hsl(var(--accent-h), 50%, 35%);
+
+    --bg-color: hsl(var(--accent-h), 10%, 9%);
+    --text-color: hsl(var(--accent-h), 10%, 80%);
+    --grid-color: hsla(var(--accent-h), 10%, 85%, 0.03);
   }
 
   body {
-    @apply bg-stone-50 text-zinc-900 transition-colors duration-500 antialiased font-sans min-h-screen;
-    /* Дуже ніжна мікро-сітка для світлої теми */
-    background-image: radial-gradient(circle, rgba(0,0,0,0.05) 2px, transparent 2px);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    @apply transition-colors duration-500 antialiased font-sans min-h-screen;
+    background-image: radial-gradient(circle, var(--grid-color) 2px, transparent 2px);
     background-size: 32px 32px;
   }
 
-  .dark body {
-    @apply bg-zinc-950 text-zinc-100;
-    /* Ледь помітна мікро-сітка для темної теми */
-    background-image: radial-gradient(circle, rgba(255,255,255,0.03) 2px, transparent 2px);
+  /* Глобальна корекція медіа */
+  img, video {
+    @apply transition-[filter] duration-700 ease-in-out dark:brightness-75 dark:contrast-125 dark:saturate-110;
+  }
+
+  /* Універсальний ховер для посилань */
+  a, button {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* Ефект: легке зміщення вправо + зміна прозорості або кольору */
+  .hover-link {
+    @apply hover:text-accent hover:translate-x-1 inline-block;
   }
 }
+
+/* ... анімація cover-reveal ... */
 
 @keyframes cover-reveal {
-  0% {
-    opacity: 0;
-    transform: translateY(40px) scale(0.97);
-    filter: blur(8px);
+  0% { opacity: 0; transform: translateY(40px) scale(0.97); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* =========================================
+     ВЕРХНЯ НАВІГАЦІЯ (Layout)
+     ========================================= */
+  .top-nav {
+    @apply absolute top-6 left-4 right-4 md:top-8 md:left-8 md:right-8 z-50 flex justify-between items-center font-mono text-xs uppercase tracking-[0.2em] mix-blend-difference text-white;
   }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+
+  .nav-links-group {
+    @apply flex gap-1;
+  }
+
+  .nav-link {
+    @apply p-3 transition-colors hover:text-accent;
+  }
+
+  /* Стани для активної/неактивної мови */
+  .nav-link.is-active {
+    @apply border-b border-white;
+  }
+  .nav-link.is-inactive {
+    @apply opacity-40 hover:opacity-100;
+  }
+
+  .theme-toggle-btn {
+    @apply p-3 hover:scale-105 transition-transform cursor-pointer tracking-widest;
+  }
+
+/* =========================================
+   КАСТОМНИЙ КУРСОР (Тільки для десктопів)
+   ========================================= */
+@media (pointer: fine) {
+  body, a, button, .cursor-pointer {
+    cursor: none !important;
   }
 }
 
-.animate-cover {
-  animation: cover-reveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.magic-cursor {
+  /* Базовий стан: маленька крапка з інверсією кольору */
+  @apply fixed top-0 left-0 pointer-events-none z-9999 rounded-full bg-white;
+  width: 10px;
+  height: 10px;
+  mix-blend-mode: difference;
+  
+  /* Транзишени тільки для розміру та форми. Позицію ми анімуємо через JS для максимальної плавності */
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.3s,
+              border 0.3s;
+}
+
+/* Стан при наведенні на посилання: велике порожнє кільце */
+.magic-cursor.is-hovering {
+  width: 44px;
+  height: 44px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 1);
 }

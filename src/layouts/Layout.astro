@@ -1,28 +1,37 @@
 ---
 // src/layouts/Layout.astro
-import { getCollection } from 'astro:content';
-import '../styles/global.css';
+import { getCollection } from "astro:content";
+import "../styles/global.css";
 
-const settingsCollection = await getCollection('settings');
+const settingsCollection = await getCollection("settings");
 const globalSettings = settingsCollection[0]?.data || {
-	siteTitle: 'PUSHKAREFF Production',
-	siteDescription_uk: 'Дизайн та продакшн студія',
-	ogImage: '/images/seo/default-og.jpg'
+	siteTitle: "PUSHKAREFF Production",
+	siteDescription_uk: "Дизайн та продакшн студія",
+	ogImage: "/images/seo/default-og.jpg",
 };
 
 interface Props {
 	title?: string;
 	description?: string;
 	image?: string;
-	lang?: 'uk' | 'en'; 
+	lang?: "uk" | "en";
 }
 
-const { title, description, image, lang = 'uk' } = Astro.props;
+const { title, description, image, lang = "uk" } = Astro.props;
 
-const finalTitle = title ? `${title} | ${globalSettings.siteTitle}` : globalSettings.siteTitle;
-const globalDesc = lang === 'uk' ? globalSettings.siteDescription_uk : globalSettings.siteDescription_en;
-const finalDescription = description || globalDesc || '';
-const finalImage = image || globalSettings.ogImage || '';
+const finalTitle = title
+	? `${title} | ${globalSettings.siteTitle}`
+	: globalSettings.siteTitle;
+const globalDesc =
+	lang === "uk"
+		? globalSettings.siteDescription_uk
+		: globalSettings.siteDescription_en;
+const finalDescription = description || globalDesc || "";
+const finalImage = image || globalSettings.ogImage || "";
+
+// Двомовні тексти для перемикача
+const themeDarkText = lang === "uk" ? "● ТЕМНА ТЕМА" : "● DARK MODE";
+const themeLightText = lang === "uk" ? "○ СВІТЛА ТЕМА" : "○ LIGHT MODE";
 ---
 
 <!doctype html>
@@ -35,52 +44,48 @@ const finalImage = image || globalSettings.ogImage || '';
 
 		<title>{finalTitle}</title>
 		<meta name="description" content={finalDescription} />
-		
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
 
 		<script is:inline>
 			const theme = (() => {
-				if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-					return localStorage.getItem('theme');
+				if (
+					typeof localStorage !== "undefined" &&
+					localStorage.getItem("theme")
+				) {
+					return localStorage.getItem("theme");
 				}
-				if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
-				return 'light';
+				if (window.matchMedia("(prefers-color-scheme: dark)").matches)
+					return "dark";
+				return "light";
 			})();
-			if (theme === 'dark') document.documentElement.classList.add('dark');
+			if (theme === "dark")
+				document.documentElement.classList.add("dark");
 		</script>
 	</head>
 
 	<body class="relative">
+		<div id="magic-cursor" class="magic-cursor hidden md:block"></div>
 		
-		<nav class="absolute top-8 left-8 right-8 z-50 flex justify-between items-center font-mono text-[10px] uppercase tracking-[0.2em] mix-blend-difference text-white">
-			<div class="flex gap-4">
-				<a href="/" class={`transition-colors hover:text-accent ${lang === 'uk' ? 'border-b border-white' : 'opacity-40 hover:opacity-100'}`}>UK</a>
-				<a href="/en" class={`transition-colors hover:text-accent ${lang === 'en' ? 'border-b border-white' : 'opacity-40 hover:opacity-100'}`}>EN</a>
+		<nav class="top-nav">
+			<div class="nav-links-group">
+				<a href="/" class={`nav-link ${lang === 'uk' ? 'is-active' : 'is-inactive'}`}>UK</a>
+				<a href="/en" class={`nav-link ${lang === 'en' ? 'is-active' : 'is-inactive'}`}>EN</a>
 			</div>
 			
-			<button id="top-theme-toggle" class="hover:scale-105 transition-transform cursor-pointer tracking-widest">
-				<span class="dark:hidden">● DARK MODE</span>
-				<span class="hidden dark:inline text-white">○ LIGHT MODE</span>
+			<button id="top-theme-toggle" class="theme-toggle-btn">
+				<span class="dark:hidden">{themeDarkText}</span>
+				<span class="hidden dark:inline text-white">{themeLightText}</span>
 			</button>
 		</nav>
 
 		<slot />
 
-		<script>
-			const setRandomAccent = () => {
-				const hues = [354, 210, 160, 280, 25, 190];
-				const randomHue = hues[Math.floor(Math.random() * hues.length)];
-				document.documentElement.style.setProperty('--accent', `hsl(${randomHue}, 70%, 45%)`);
-			};
-			setRandomAccent();
-
-			const themeBtn = document.getElementById('top-theme-toggle');
-			themeBtn?.addEventListener('click', () => {
-				document.documentElement.classList.toggle('dark');
-				localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-			});
-		</script>
+		<script src="../scripts/app.js"></script>
 	</body>
 </html>

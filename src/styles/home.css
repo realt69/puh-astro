@@ -1,0 +1,109 @@
+@reference "../styles/global.css";
+
+/* =========================================
+	   СТРУКТУРА ТА МАКЕТ
+	   ========================================= */
+.main-wrapper {
+    @apply w-full h-screen relative flex items-center justify-center px-6 overflow-hidden;
+}
+
+.magazine-cover {
+    /* Асиметричні відступи, приглушення тексту в темній темі (dark:text-white/80) */
+    @apply relative z-10 w-full aspect-3/4 overflow-hidden flex flex-col justify-between pt-4 pb-6 md:pt-6 md:pb-10 mx-auto text-white/95 dark:text-white/80 transition-colors duration-1000 ease-in-out shadow-2xl bg-accent;
+
+    max-width: calc(85vh * 0.75);
+    animation: cover-reveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* =========================================
+	   ШАР 0: ГЛЯНЕЦЬ (Glossy Overlay)
+	   ========================================= */
+.glossy-overlay {
+    @apply absolute inset-0 z-20 pointer-events-none;
+    background-image: linear-gradient(92deg,
+            rgba(255, 255, 255, 0) 35%,
+            rgba(255, 255, 255, 0.15) 50%,
+            rgba(255, 255, 255, 0.45) 65%,
+            /* ПІК: 45% яскравості */
+            rgba(255, 255, 255, 0.15) 80%,
+            rgba(255, 255, 255, 0) 95%);
+    mix-blend-mode: overlay;
+}
+
+/* =========================================
+	   ШАР 1: ХЕДЕР (Лого та Дата)
+	   ========================================= */
+.cover-header {
+    @apply relative w-11/12 mx-auto flex items-center z-30;
+}
+
+.logo-container {
+    @apply w-[50%] md:w-[55%];
+}
+
+.logo-image {
+    /* Інверсія для світлої теми, м'яка інверсія для темної */
+    @apply w-full h-auto transition-all duration-700 invert dark:invert-[0.85] drop-shadow-sm;
+}
+
+.issue-date-wrapper {
+    @apply absolute right-0 top-1/2 -translate-y-1/2 pl-2 border-l border-white/40;
+}
+
+.issue-date {
+    @apply font-mono text-[8px] tracking-[0.25em] opacity-90 drop-shadow-md;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+}
+
+/* =========================================
+	   ШАР 2: ГОЛОВНЕ ФОТО
+	   ========================================= */
+.hero-image-container {
+    @apply w-[125%] aspect-4/3 self-center overflow-hidden relative z-10 mt-2 mb-6 md:mt-4 md:mb-10 shadow-xl bg-black;
+}
+
+.hero-image {
+    /* Чисті класи Tailwind v4, без зайвих дужок. Темна тема обробляється в global.css */
+    @apply w-full h-full object-cover grayscale-15;
+}
+
+/* =========================================
+	   ШАР 3: РУБРИКИ НА ПЛАШКАХ
+	   ========================================= */
+.categories-nav {
+    @apply absolute right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col items-end gap-3 w-full pointer-events-none;
+}
+
+.category-pill {
+    /* Додано інтелектуальний ховер hover:pl-10 для виїзду плашки */
+    @apply pointer-events-auto pl-8 pr-[4.166%] py-1 md:py-2 font-serif italic text-base md:text-xl lowercase transition-all backdrop-blur-lg border-y border-l rounded-l-xs hover:pl-10 cursor-pointer;
+}
+
+.category-pill.is-active {
+    @apply bg-accent text-white border-accent shadow-lg font-bold;
+}
+
+.category-pill.is-inactive {
+    @apply bg-black/20 text-white/70 border-white/10 hover:bg-black/50 hover:text-white;
+}
+
+/* =========================================
+	   ШАР 4: ФУТЕР (Заголовок та посилання)
+	   ========================================= */
+.cover-footer {
+    @apply w-11/12 mx-auto flex flex-col items-start text-left z-30 gap-1 cursor-pointer;
+}
+
+.featured-label {
+    @apply font-mono text-[9px] uppercase tracking-[0.3em] opacity-80 drop-shadow-md transition-opacity group-hover:opacity-100;
+}
+
+.cover-title {
+    @apply w-full font-serif italic text-lg md:text-2xl lg:text-3xl font-bold leading-[1.1] tracking-tight m-0 drop-shadow-xl transition-opacity group-hover:opacity-90;
+}
+
+.read-more-btn {
+    /* Анімоване підкреслення, яке виростає при наведенні на весь футер (group-hover) */
+    @apply font-mono text-[8px] uppercase tracking-widest mt-1 opacity-80 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-current after:transition-all after:duration-300 group-hover:after:w-full group-hover:opacity-100;
+}
