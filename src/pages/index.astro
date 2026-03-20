@@ -1,17 +1,161 @@
 ---
+import Layout from '@/layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 
+const works = await getCollection('works');
+works.sort((a, b) => (b.data.publishDate?.getTime() || 0) - (a.data.publishDate?.getTime() || 0));
+
+const coverStory = works[0];
+
+const categoryMap: Record<string, string> = {
+	'print': 'Дизайн поліграфії',
+	'web': 'Розробка сайтів',
+	'brand': 'Розробка бренду',
+	'3d': '3D простір'
+};
+const allCategories = Object.keys(categoryMap);
+
+let issueDateStr = '';
+if (coverStory?.data.publishDate) {
+	const dateObj = new Date(coverStory.data.publishDate);
+	issueDateStr = new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric' }).format(dateObj).replace(/ р\.$/, '').trim();
+}
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout lang="uk">
+	<main class="main-wrapper">
+		
+		<div id="magazine-cover" class="magazine-cover">
+			{coverStory && (
+				<>
+					<header class="cover-header">
+						<div class="logo-container">
+							<img src="/logo.svg" alt="LOGO" class="logo-image" />
+						</div>
+						<div class="issue-date">
+							{issueDateStr}
+						</div>
+					</header>
+
+					<div class="hero-image-container">
+						{coverStory.data.coverImage_uk && (
+							<Image src={coverStory.data.coverImage_uk} alt="" width={1600} class="hero-image" />
+						)}
+					</div>
+
+					<nav class="categories-nav">
+						{allCategories.map(cat => (
+							<a 
+								href={`/category/${cat}`} 
+								class={`category-pill ${cat === coverStory.data.category ? 'is-active' : 'is-inactive'}`}
+							>
+								{categoryMap[cat]}
+							</a>
+						))}
+					</nav>
+
+					<a href={`/works/${coverStory.id}`} class="cover-footer group">
+						<p class="featured-label">[ featured case ]</p>
+						<h2 class="cover-title">
+							{coverStory.data.title_uk}
+						</h2>
+						<span class="read-more-btn">
+							[ розгорнути кейс ]
+						</span>
+					</a>
+				</>
+			)}
+		</div>
+	</main>
+</Layout>
+
+<style>
+	@reference "../styles/global.css";
+	/* =========================================
+	   СТРУКТУРА ТА МАКЕТ
+	   ========================================= */
+	.main-wrapper {
+		@apply w-full h-screen relative flex items-center justify-center px-6 overflow-hidden;
+	}
+
+	.magazine-cover {
+		/* 1. Прибрали animate-cover звідси */
+		@apply relative z-10 w-full aspect-3/4 overflow-hidden flex flex-col justify-between py-5 md:py-8 mx-auto text-stone-50 transition-colors duration-1000 ease-in-out shadow-2xl bg-accent;
+		
+		max-width: calc(85vh * 0.75);
+		
+		/* 2. Написали анімацію напряму звичайним CSS */
+		animation: cover-reveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	/* =========================================
+	   ШАР 1: ХЕДЕР (Лого та Дата)
+	   ========================================= */
+	.cover-header {
+		@apply w-11/12 mx-auto flex justify-between items-start z-30;
+	}
+	
+	.logo-container {
+		@apply w-[70%];
+	}
+	
+	.logo-image {
+		@apply w-full h-auto invert drop-shadow-sm;
+	}
+
+	.issue-date {
+		@apply shrink-0 font-mono text-[10px] uppercase tracking-widest opacity-90 mt-2 drop-shadow-md;
+		writing-mode: vertical-rl;
+		transform: rotate(180deg);
+	}
+
+	/* =========================================
+	   ШАР 2: ГОЛОВНЕ ФОТО
+	   ========================================= */
+	.hero-image-container {
+		@apply w-[125%] aspect-4/3 self-center overflow-hidden relative z-10 my-4 shadow-xl;
+	}
+
+	.hero-image {
+		@apply w-full h-full object-cover grayscale-15;
+	}
+
+	/* =========================================
+	   ШАР 3: РУБРИКИ НА ПЛАШКАХ
+	   ========================================= */
+	.categories-nav {
+		@apply absolute right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col items-end gap-3 w-full pointer-events-none;
+	}
+
+	.category-pill {
+		@apply pointer-events-auto pl-8 pr-[4.166%] py-1 md:py-2 font-serif italic text-base md:text-xl lowercase transition-all backdrop-blur-lg border-y border-l rounded-l-xs;
+	}
+
+	.category-pill.is-active {
+		@apply bg-accent text-white border-accent shadow-lg font-bold;
+	}
+
+	.category-pill.is-inactive {
+		@apply bg-black/20 text-white/70 border-white/10 hover:bg-black/50 hover:text-white;
+	}
+
+	/* =========================================
+	   ШАР 4: ФУТЕР (Заголовок та посилання)
+	   ========================================= */
+	.cover-footer {
+		@apply w-11/12 mx-auto flex flex-col items-start text-left z-30 gap-1 cursor-pointer;
+	}
+
+	.featured-label {
+		@apply font-mono text-[9px] uppercase tracking-[0.3em] opacity-80 drop-shadow-md;
+	}
+
+	.cover-title {
+		@apply w-full font-serif italic text-lg md:text-2xl lg:text-3xl font-bold leading-[1.1] tracking-tight m-0 drop-shadow-xl group-hover:opacity-70 transition-opacity;
+	}
+
+	.read-more-btn {
+		@apply font-mono text-[9px] uppercase tracking-widest mt-1 opacity-90 group-hover:text-zinc-900 transition-colors;
+	}
+</style>
