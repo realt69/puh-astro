@@ -33,28 +33,27 @@
 /* =========================================
 	   ШАР 1: ХЕДЕР (Лого та Дата)
 	   ========================================= */
-.cover-header {
-    @apply relative w-11/12 mx-auto flex items-center z-30;
-}
+	.cover-header {
+		/* Прибрали pt-1, тепер все ідеально по верхньому краю контейнера */
+		@apply relative w-11/12 mx-auto flex items-start justify-between z-30; 
+	}
+	
+	.logo-container {
+		@apply w-[35%] md:w-[40%] transition-all duration-300;
+	}
+	
+	.logo-image {
+		@apply w-full h-auto transition-all duration-700 invert dark:invert-[0.85] drop-shadow-sm;
+	}
 
-.logo-container {
-    @apply w-[50%] md:w-[55%];
-}
+	.issue-date-wrapper {
+		/* Прибрали mt-1, абсолютна прив'язка до верху */
+		@apply relative text-right;
+	}
 
-.logo-image {
-    /* Інверсія для світлої теми, м'яка інверсія для темної */
-    @apply w-full h-auto transition-all duration-700 invert dark:invert-[0.85] drop-shadow-sm;
-}
-
-.issue-date-wrapper {
-    @apply absolute right-0 top-1/2 -translate-y-1/2 pl-2 border-l border-white/40;
-}
-
-.issue-date {
-    @apply font-mono text-[8px] tracking-[0.25em] opacity-90 drop-shadow-md;
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-}
+	.issue-date {
+		@apply font-mono text-xs md:text-sm tracking-widest opacity-90 drop-shadow-md;
+	}
 
 /* =========================================
 	   ШАР 2: ГОЛОВНЕ ФОТО

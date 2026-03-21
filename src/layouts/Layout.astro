@@ -1,37 +1,18 @@
 ---
 // src/layouts/Layout.astro
-import { getCollection } from "astro:content";
-import "../styles/global.css";
-
-const settingsCollection = await getCollection("settings");
-const globalSettings = settingsCollection[0]?.data || {
-	siteTitle: "PUSHKAREFF Production",
-	siteDescription_uk: "Дизайн та продакшн студія",
-	ogImage: "/images/seo/default-og.jpg",
-};
+import '../styles/global.css';
+import CustomCursor from '../components/CustomCursor.astro';
 
 interface Props {
-	title?: string;
-	description?: string;
-	image?: string;
-	lang?: "uk" | "en";
+	title: string;
 }
 
-const { title, description, image, lang = "uk" } = Astro.props;
+const { title } = Astro.props;
 
-const finalTitle = title
-	? `${title} | ${globalSettings.siteTitle}`
-	: globalSettings.siteTitle;
-const globalDesc =
-	lang === "uk"
-		? globalSettings.siteDescription_uk
-		: globalSettings.siteDescription_en;
-const finalDescription = description || globalDesc || "";
-const finalImage = image || globalSettings.ogImage || "";
-
-// Двомовні тексти для перемикача
-const themeDarkText = lang === "uk" ? "● ТЕМНА ТЕМА" : "● DARK MODE";
-const themeLightText = lang === "uk" ? "○ СВІТЛА ТЕМА" : "○ LIGHT MODE";
+// Тимчасово хардкодимо мову
+const lang: string = 'uk';
+const themeLightText = 'СВІТЛО';
+const themeDarkText = 'ТЕМРЯВА';
 ---
 
 <!doctype html>
@@ -41,51 +22,57 @@ const themeLightText = lang === "uk" ? "○ СВІТЛА ТЕМА" : "○ LIGHT 
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-
-		<title>{finalTitle}</title>
-		<meta name="description" content={finalDescription} />
-
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@400;700&display=swap"
-			rel="stylesheet"
-		/>
-
+		<title>{title} — PUSHKAREFF</title>
+		
 		<script is:inline>
 			const theme = (() => {
-				if (
-					typeof localStorage !== "undefined" &&
-					localStorage.getItem("theme")
-				) {
-					return localStorage.getItem("theme");
+				if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+					return localStorage.getItem('theme');
 				}
-				if (window.matchMedia("(prefers-color-scheme: dark)").matches)
-					return "dark";
-				return "light";
+				if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+					return 'dark';
+				}
+				return 'light';
 			})();
-			if (theme === "dark")
-				document.documentElement.classList.add("dark");
+			if (theme === 'dark') {
+				document.documentElement.classList.add('dark');
+			} else {
+				document.documentElement.classList.remove('dark');
+			}
+
+			const hues = [354, 210, 160, 280, 25, 190];
+			const randomHue = hues[Math.floor(Math.random() * hues.length)];
+			document.documentElement.style.setProperty('--accent-h', randomHue.toString());
 		</script>
 	</head>
-
+	
 	<body class="relative">
-		<div id="magic-cursor" class="magic-cursor hidden md:block"></div>
+		<CustomCursor />
 		
-		<nav class="top-nav">
-			<div class="nav-links-group">
-				<a href="/" class={`nav-link ${lang === 'uk' ? 'is-active' : 'is-inactive'}`}>UK</a>
-				<a href="/en" class={`nav-link ${lang === 'en' ? 'is-active' : 'is-inactive'}`}>EN</a>
-			</div>
+		<div class="site-wrapper">
 			
-			<button id="top-theme-toggle" class="theme-toggle-btn">
-				<span class="dark:hidden">{themeDarkText}</span>
-				<span class="hidden dark:inline text-white">{themeLightText}</span>
-			</button>
-		</nav>
+			<nav class="top-nav">
+				<div class="nav-links-group">
+					<a href="/" class={`nav-link ${lang === 'uk' ? 'is-active' : 'is-inactive'}`}>UK</a>
+					<a href="/en" class={`nav-link ${lang === 'en' ? 'is-active' : 'is-inactive'}`}>EN</a>
+				</div>
+				
+				<button id="top-theme-toggle" class="theme-toggle-btn">
+					<span class="dark:hidden">{themeDarkText}</span>
+					<span class="hidden dark:inline text-white">{themeLightText}</span>
+				</button>
+			</nav>
 
-		<slot />
+			<slot />
 
-		<script src="../scripts/app.js"></script>
+		</div>
+
+		<script>
+			const themeBtn = document.getElementById('top-theme-toggle');
+			themeBtn?.addEventListener('click', () => {
+				const isDark = document.documentElement.classList.toggle('dark');
+				localStorage.setItem('theme', isDark ? 'dark' : 'light');
+			});
+		</script>
 	</body>
 </html>

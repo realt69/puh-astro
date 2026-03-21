@@ -1,0 +1,80 @@
+---
+// src/components/CustomCursor.astro
+---
+
+
+<div id="magic-cursor" class="magic-cursor hidden md:block"></div>
+
+<style>
+    @reference "../styles/global.css";
+    /* Всі стилі курсора тепер ізольовані тут */
+    .magic-cursor {
+        @apply fixed top-0 left-0 pointer-events-none z-9999 rounded-full bg-white;
+        width: 10px;
+        height: 10px;
+        mix-blend-mode: difference;
+        transition:
+            width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+            height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+            background-color 0.3s,
+            border 0.3s;
+    }
+
+    .magic-cursor.is-hovering {
+        width: 44px;
+        height: 44px;
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 1);
+    }
+</style>
+
+<script>
+    // Логіка курсора ізольована. Astro сам її оптимізує під час build'у.
+    const initCursor = () => {
+        const cursor = document.getElementById("magic-cursor");
+        if (!cursor || !window.matchMedia("(pointer: fine)").matches) return;
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let cursorX = mouseX;
+        let cursorY = mouseY;
+
+        window.addEventListener("mousemove", (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        const loop = () => {
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
+            cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+            requestAnimationFrame(loop);
+        };
+        loop();
+
+        // Використовуємо делегування подій (найкраща практика для Astro)
+        // Використовуємо безпечну перевірку типу
+        document.addEventListener("mouseover", (e) => {
+            const target = e.target;
+            // Перевіряємо, чи це дійсно HTML-елемент, перш ніж викликати .closest()
+            if (
+                target instanceof Element &&
+                target.closest("a, button, .cursor-pointer, .category-pill")
+            ) {
+                cursor.classList.add("is-hovering");
+            }
+        });
+
+        document.addEventListener("mouseout", (e) => {
+            const target = e.target;
+            if (
+                target instanceof Element &&
+                target.closest("a, button, .cursor-pointer, .category-pill")
+            ) {
+                cursor.classList.remove("is-hovering");
+            }
+        });
+    };
+
+    initCursor();
+</script>
