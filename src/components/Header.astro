@@ -1,0 +1,69 @@
+---
+import pushkareffLogo from '../assets/logo.svg?raw'; 
+
+const { pathname } = Astro.url;
+const isHome = pathname === "/" || pathname === "/uk" || pathname === "/en" || pathname === "/uk/" || pathname === "/en/";
+
+if (isHome) return null;
+
+const currentLang = pathname.startsWith('/en') ? 'en' : 'uk';
+---
+
+<aside id="magic-header" class="fixed top-0 right-0 h-screen w-16 flex-col items-center justify-between py-12 px-2 z-50 mix-blend-difference hidden md:flex border-l border-white/20" transition:persist="magic-header">
+  
+  <a href="/" class="group logo-symbol-only" title="PUSHKAREFF | Home">
+    <div class="h-10 w-auto fill-white selection:bg-transparent transition-colors duration-300 group-hover:fill-accent">
+      <Fragment set:html={pushkareffLogo} />
+    </div>
+  </a>
+
+  <nav class="flex flex-col items-center gap-y-24 font-mono text-[10px] uppercase tracking-[0.2em] h-auto justify-center w-full">
+    <a href="/works" class="spine-link hover:line-through whitespace-nowrap text-white">/WORKS</a>
+    <a href="/about" class="spine-link hover:line-through whitespace-nowrap text-white">/ABOUT</a>
+    <a href="/index" class="spine-link hover:line-through whitespace-nowrap text-white">/INDEX</a>
+  </nav>
+
+  <div class="flex flex-col gap-y-10 items-center font-mono text-[9px] uppercase tracking-widest text-white opacity-80">
+    <button id="top-theme-toggle" class="group flex items-center justify-center" title="Switch Mode">
+      <span class="text-[10px] dark:hidden font-bold opacity-60 group-hover:opacity-100 transition-opacity">N</span>
+      <span class="text-[10px] hidden dark:inline font-bold opacity-60 group-hover:opacity-100 transition-opacity">B</span>
+    </button>
+    
+    <div class="flex flex-col items-center gap-y-2">
+      <a href="/" class={`${currentLang === 'uk' ? 'font-bold' : 'opacity-60 hover:opacity-100'} text-[10px]`}>UA</a> 
+      <a href="/en" class={`${currentLang === 'en' ? 'font-bold' : 'opacity-60 hover:opacity-100'} text-[10px]`}>EN</a>
+    </div>
+  </div>
+</aside>
+
+<header class="fixed top-0 left-0 w-full h-16 px-6 z-50 flex items-center justify-between md:hidden mix-blend-difference" transition:persist="magic-header-mobile">
+  <a href="/" class="logo-symbol-only">
+    <div class="h-8 w-auto fill-white">
+      <Fragment set:html={pushkareffLogo} />
+    </div>
+  </a>
+  
+  <div class="flex items-center gap-x-6 font-mono text-[10px] uppercase tracking-widest text-white">
+    <a href="/works">/WORKS</a>
+    <button onclick="document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');" class="text-[10px] dark:hidden font-bold">N</button>
+    <button onclick="document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');" class="text-[10px] hidden dark:inline font-bold">B</button>
+  </div>
+</header>
+
+<style is:global>
+  @reference "../styles/global.css";
+
+  .logo-symbol-only svg text {
+    display: none !important;
+  }
+  
+  .logo-symbol-only svg .logo-text {
+    display: none !important;
+  }
+
+  .spine-link {
+    @apply relative transition-colors;
+    transform: rotate(-90deg);
+    transform-origin: center center;
+  }
+</style>

@@ -1,78 +1,79 @@
 ---
-// src/layouts/Layout.astro
 import '../styles/global.css';
 import CustomCursor from '../components/CustomCursor.astro';
+import Header from '../components/Header.astro'; 
 
 interface Props {
-	title: string;
+  title: string;
+  hasPattern?: boolean; // 👈 Наш тумблер для патерну
 }
 
-const { title } = Astro.props;
-
-// Тимчасово хардкодимо мову
+// За замовчуванням патерн вимкнено (чистий папір для проєктів)
+const { title, hasPattern = false } = Astro.props;
 const lang: string = 'uk';
-const themeLightText = 'СВІТЛО';
-const themeDarkText = 'ТЕМРЯВА';
 ---
 
 <!doctype html>
-<html lang={lang}>
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title} — PUSHKAREFF</title>
-		
-		<script is:inline>
-			const theme = (() => {
-				if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-					return localStorage.getItem('theme');
-				}
-				if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-					return 'dark';
-				}
-				return 'light';
-			})();
-			if (theme === 'dark') {
-				document.documentElement.classList.add('dark');
-			} else {
-				document.documentElement.classList.remove('dark');
-			}
+<html lang={lang} class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} — PUSHKAREFF</title>
+    
+    <script is:inline>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'light';
+      })();
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
 
-			const hues = [354, 210, 160, 280, 25, 190];
-			const randomHue = hues[Math.floor(Math.random() * hues.length)];
-			document.documentElement.style.setProperty('--accent-h', randomHue.toString());
-		</script>
-	</head>
-	
-	<body class="relative">
-		<CustomCursor />
-		
-		<div class="site-wrapper">
-			
-			<nav class="top-nav">
-				<div class="nav-links-group">
-					<a href="/" class={`nav-link ${lang === 'uk' ? 'is-active' : 'is-inactive'}`}>UK</a>
-					<a href="/en" class={`nav-link ${lang === 'en' ? 'is-active' : 'is-inactive'}`}>EN</a>
-				</div>
-				
-				<button id="top-theme-toggle" class="theme-toggle-btn">
-					<span class="dark:hidden">{themeDarkText}</span>
-					<span class="hidden dark:inline text-white">{themeLightText}</span>
-				</button>
-			</nav>
+      const hues = [354, 210, 160, 280, 25, 190];
+      const randomHue = hues[Math.floor(Math.random() * hues.length)];
+      document.documentElement.style.setProperty('--accent-h', randomHue.toString());
+    </script>
+  </head>
+  
+  <body class={`relative bg-stone-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-300 selection:bg-zinc-900 selection:text-stone-50 dark:selection:bg-zinc-300 dark:selection:text-zinc-950 transition-colors duration-500 overflow-x-hidden ${hasPattern ? 'body-with-pattern' : ''}`}>
+    <CustomCursor />
+    
+    <Header />
+    
+    <div class="site-wrapper relative z-10">
+      <slot />
+    </div>
 
-			<slot />
-
-		</div>
-
-		<script>
-			const themeBtn = document.getElementById('top-theme-toggle');
-			themeBtn?.addEventListener('click', () => {
-				const isDark = document.documentElement.classList.toggle('dark');
-				localStorage.setItem('theme', isDark ? 'dark' : 'light');
-			});
-		</script>
-	</body>
+    <script>
+      const themeBtn = document.getElementById('top-theme-toggle');
+      themeBtn?.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      });
+    </script>
+  </body>
 </html>
+
+<style is:global>
+  /* Архітектурний патерн (крапочки). 
+    З'являється лише на сторінках, де Layout викликано з hasPattern={true}
+  */
+  .body-with-pattern {
+    background-image: radial-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: 0 0;
+  }
+  
+  html.dark .body-with-pattern {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  }
+</style>

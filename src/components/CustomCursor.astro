@@ -2,12 +2,11 @@
 // src/components/CustomCursor.astro
 ---
 
-
-<div id="magic-cursor" class="magic-cursor hidden md:block"></div>
+<div id="magic-cursor" class="magic-cursor hidden md:block" transition:persist="magic-cursor"></div>
 
 <style>
     @reference "../styles/global.css";
-    /* Всі стилі курсора тепер ізольовані тут */
+    
     .magic-cursor {
         @apply fixed top-0 left-0 pointer-events-none z-9999 rounded-full bg-white;
         width: 10px;
@@ -29,7 +28,7 @@
 </style>
 
 <script>
-    // Логіка курсора ізольована. Astro сам її оптимізує під час build'у.
+    // Цей модуль виконається лише 1 раз завдяки тому, що DOM-елемент має transition:persist
     const initCursor = () => {
         const cursor = document.getElementById("magic-cursor");
         if (!cursor || !window.matchMedia("(pointer: fine)").matches) return;
@@ -52,11 +51,9 @@
         };
         loop();
 
-        // Використовуємо делегування подій (найкраща практика для Astro)
-        // Використовуємо безпечну перевірку типу
+        // Делегування подій - ідеально для SPA-переходів Astro
         document.addEventListener("mouseover", (e) => {
             const target = e.target;
-            // Перевіряємо, чи це дійсно HTML-елемент, перш ніж викликати .closest()
             if (
                 target instanceof Element &&
                 target.closest("a, button, .cursor-pointer, .category-pill")

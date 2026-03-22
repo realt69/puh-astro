@@ -4,18 +4,16 @@
 
 @theme {
   --font-sans: "Inter", sans-serif;
-  --font-serif: "Cormorant Garamond", serif;
+  --font-serif: "Oranienbaum", serif;
+  --font-oranienbaum: "Oranienbaum", serif;
   --color-accent: var(--accent);
 }
 
 @layer base {
   :root {
+    /* Наш джазовий акцент (HSL-відтінок змінюється JS-скриптом у BaseLayout) */
     --accent-h: 354;
     --accent: hsl(var(--accent-h), 70%, 45%);
-
-    --bg-color: hsl(var(--accent-h), 15%, 97%);
-    --text-color: hsl(var(--accent-h), 15%, 15%);
-    --grid-color: hsla(var(--accent-h), 15%, 15%, 0.05);
 
     /* НАШ ІДЕАЛЬНИЙ ВЕРТИКАЛЬНИЙ РИТМ (Baseline) */
     --baseline: 24px;
@@ -24,67 +22,29 @@
   }
 
   .dark {
+    /* У темній темі акцентний колір стає трохи глибшим */
     --accent: hsl(var(--accent-h), 50%, 35%);
-    --bg-color: hsl(var(--accent-h), 10%, 9%);
-    --text-color: hsl(var(--accent-h), 10%, 80%);
-    --grid-color: hsla(var(--accent-h), 10%, 85%, 0.03);
   }
 
-  body {
-    @apply bg-[#0a0a0c] min-h-screen font-sans antialiased;
-  }
-
-  .site-wrapper {
-    @apply relative w-full max-w-[1600px] mx-auto min-h-screen overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] transition-colors duration-500;
-    
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    
-    /* СИНХРОНІЗУЄМО ВІЗУАЛЬНУ СІТКУ З РИТМОМ: 24px на 24px */
-    background-image: radial-gradient(circle, var(--grid-color) 2px, transparent 2px);
-    background-size: var(--baseline) var(--baseline);
-    background-position: top left;
-  }
-
-  /* Глобальна корекція медіа */
-  img, video {
+  /* Глобальна корекція медіа (Editorial ефект) */
+  img,
+  video {
     @apply transition-[filter] duration-700 ease-in-out dark:brightness-75 dark:contrast-125 dark:saturate-110;
   }
 
-  /* Універсальний ховер для посилань */
-  a, button {
+  /* Універсальний плавний перехід для інтерактивних елементів */
+  a,
+  button {
     @apply transition-all duration-300 ease-in-out;
   }
 
-  /* =========================================
-     ВЕРХНЯ НАВІГАЦІЯ (Layout)
-     ========================================= */
-  .top-nav {
-    @apply absolute top-6 left-4 right-4 md:top-8 md:left-8 md:right-8 z-50 flex justify-between items-center font-mono text-xs uppercase tracking-[0.2em] mix-blend-difference text-white;
-  }
-
-  .nav-links-group {
-    @apply flex gap-1;
-  }
-
-  .nav-link {
-    @apply p-3 transition-colors hover:text-accent;
-  }
-
-  .nav-link.is-active {
-    @apply border-b border-white;
-  }
-  .nav-link.is-inactive {
-    @apply opacity-40 hover:opacity-100;
-  }
-
-  .theme-toggle-btn {
-    @apply p-3 hover:scale-105 transition-transform cursor-pointer tracking-widest;
-  }
-
-  /* Відключаємо стандартний курсор для десктопів */
+  /* Відключаємо стандартний курсор для десктопів (бо працює CustomCursor) */
   @media (pointer: fine) {
-    body, a, button, .cursor-pointer {
+
+    body,
+    a,
+    button,
+    .cursor-pointer {
       cursor: none !important;
     }
   }

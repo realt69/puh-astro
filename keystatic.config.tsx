@@ -28,6 +28,7 @@ export default config({
       slugField: 'title_en',
       path: 'src/content/works/*/', 
       format: { contentField: 'content_uk' }, 
+      columns: ['title_uk', 'publishDate', 'category'],
       
       // === ТВІЙ ІДЕАЛЬНИЙ ПОРЯДОК ===
       schema: {

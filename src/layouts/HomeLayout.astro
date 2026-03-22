@@ -1,0 +1,40 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  lang?: string;
+}
+
+const { title, lang = "uk" } = Astro.props;
+const { pathname } = Astro.url;
+
+const currentLang = pathname.startsWith('/en') ? 'en' : 'uk';
+---
+
+<BaseLayout 
+  title={title} 
+  lang={lang}
+  
+  bodyClass="bg-stone-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-300 selection:bg-zinc-900 selection:text-stone-50 dark:selection:bg-zinc-300 dark:selection:text-zinc-950"
+>
+  <nav class="relative w-full z-50 px-6 md:px-12 py-4 flex justify-between items-start font-mono text-[10px] uppercase tracking-[0.2em]">
+    <div class="flex gap-x-2 items-baseline opacity-80">
+      <a href="/" class={`transition-colors leading-[12px] ${currentLang === 'uk' ? 'font-bold text-zinc-900 dark:text-white' : 'opacity-60 hover:opacity-100'}`}>UA</a> 
+      <span class="opacity-30 leading-[12px]">/</span> 
+      <a href="/en" class={`transition-colors leading-[12px] ${currentLang === 'en' ? 'font-bold text-zinc-900 dark:text-white' : 'opacity-60 hover:opacity-100'}`}>EN</a>
+    </div>
+    
+    <button class="theme-toggle hover:opacity-100 transition-opacity flex items-baseline gap-x-2 opacity-80" title="Switch Mode">
+      <span class="opacity-50 leading-[12px]">Mode</span>
+      <div class="leading-[12px] text-zinc-900 dark:text-white font-bold">
+        <span class="dark:hidden">NOIR</span>
+        <span class="hidden dark:inline">BLANC</span>
+      </div>
+    </button>
+  </nav>
+
+  <div class="flex flex-col grow overflow-visible relative">
+    <slot />
+  </div>
+</BaseLayout>
